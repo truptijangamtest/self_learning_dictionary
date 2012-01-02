@@ -1,15 +1,28 @@
+require 'yaml' 
 class SelfLearningDictionary
-
 
   def print_self_learning_dictionary()
 
-    #Creating Hash for storing key-value pairs
     dictionary = Hash.new{}
-    dictionary={ 'CAR'=>'A car is a vehicle with four wheelers.' }
+    if File.exist? "dict.yml"
+      #Creating Hash for storing key-value pairs
+      output = File.new('dict.yml', 'r')
+      #dictionary={ 'CAR'=>'A car is a vehicle with four wheelers.' }
+      dictionary=YAML.load(output.read)
+    else
+      @dict = {"CAR" => "A car is a vehicle with four wheelers." }
+      output = File.new('dict.yml', 'w')
+      output.puts YAML.dump(@dict)
+      output.close
+
+      output = File.new('dict.yml', 'r')
+      #dictionary={ 'CAR'=>'A car is a vehicle with four wheelers.' }
+      dictionary=YAML.load(output.read)
+    end
+
     # Show welcome message to user, also show a message saying that how to end the program
     puts "Welcome to the self-learning dictionary!"
     puts "Enter END to exit."
-
     puts "Please enter a word:"
 
     #Use std I/O function gets to accept input from user
@@ -17,7 +30,7 @@ class SelfLearningDictionary
     #inside the loop accept input till use enters END to terminate program
 
     #using gets.chomp so as to remove trailing \n of string accepted
-    word = gets.chomp
+    word = STDIN.gets.chomp
 
     #Use of while loop to iterate
     while (word != 'END') do
@@ -27,23 +40,34 @@ class SelfLearningDictionary
         puts dictionary[word]
       else
         puts "Sorry, not found. Add to Dictionary? (y / n):"
-        ans = gets.chomp
+        ans = STDIN.gets.chomp
+
         if ans == 'y'
           puts "Please enter a value to add to dictionary:"
-          description = gets.chomp
+          description = STDIN.gets.chomp
+          dictionary = add_to_dictionary(dictionary, word, description)
 
-          #Use of merge to merge the new values
-          dictionary = dictionary.merge(word => description)
+          #yaml_data = dictionary.to_yaml
+          #YAML.dump(dictionary)
+          outputforwrite = File.new('dict.yml', 'w')
+          outputforwrite.puts YAML.dump(dictionary)
           puts "Added to dictionary succesfully."
           puts "Thank You!"
         end
       end
       puts "Please enter a word:"
-      word = gets.chomp
+      word = STDIN.gets.chomp
     end 
     puts "Thank you for using self learning dictionary."
+  end
+
+  def add_to_dictionary(dictionary, word,description)
+    #Use of merge to merge the new values
+    dictionary = dictionary.merge(word => description)
+    return dictionary
   end
 
   dictionaryobj = SelfLearningDictionary.new
   dictionaryobj.print_self_learning_dictionary
 end
+
